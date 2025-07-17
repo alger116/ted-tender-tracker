@@ -119,7 +119,6 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch, onExport, loading, ha
                   <SelectValue placeholder="All types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All types</SelectItem>
                   <SelectItem value="notice">Contract Notice</SelectItem>
                   <SelectItem value="tender">Contract Award</SelectItem>
                 </SelectContent>
@@ -166,7 +165,6 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch, onExport, loading, ha
                   <SelectValue placeholder="All CPV codes" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All CPV codes</SelectItem>
                   {metadata.cpvCodes.map((cpv) => (
                     <SelectItem key={cpv.code} value={cpv.code}>
                       {cpv.code} - {cpv.description}
@@ -184,7 +182,6 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch, onExport, loading, ha
                   <SelectValue placeholder="All countries" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All countries</SelectItem>
                   {metadata.countries.map((country) => (
                     <SelectItem key={country.code} value={country.code}>
                       {country.name}
