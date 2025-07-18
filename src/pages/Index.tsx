@@ -1,19 +1,27 @@
 
 import React, { useState } from 'react';
-import { Database, Info, ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Database, Info, ExternalLink, LogOut, Calculator, User, Settings } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import SearchForm from '../components/SearchForm';
 import ResultsTable from '../components/ResultsTable';
+import MarketShareCalculator from '../components/MarketShareCalculator';
 import { searchTED, SearchFilters, SearchResponse } from '../api/sparql';
 import { exportToCSV } from '../utils/csvExport';
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
   const [searchResponse, setSearchResponse] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [currentFilters, setCurrentFilters] = useState<SearchFilters>({});
   const { toast } = useToast();
+  const { user, profile, loading: authLoading, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const handleSearch = async (filters: SearchFilters) => {
     setLoading(true);
@@ -88,6 +96,17 @@ const Index = () => {
     }
   };
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       {/* Header */}
@@ -103,49 +122,107 @@ const Index = () => {
                 <p className="text-sm text-slate-600">Search EU Tenders Electronic Daily notices and tenders</p>
               </div>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => window.open('https://data.europa.eu/data/datasets/ted-csv', '_blank')}
-              className="border-slate-300 text-slate-700 hover:bg-slate-50"
-            >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              About TED Data
-            </Button>
+            
+            <div className="flex items-center gap-3">
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      {profile?.full_name || user.email}
+                      {profile?.role === 'admin' && (
+                        <Badge variant="secondary" className="ml-1">Admin</Badge>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => signOut()}>
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/auth')}
+                  className="flex items-center gap-2"
+                >
+                  <User className="h-4 w-4" />
+                  Sign In
+                </Button>
+              )}
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open('https://data.europa.eu/data/datasets/ted-csv', '_blank')}
+                className="border-slate-300 text-slate-700 hover:bg-slate-50"
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                About TED Data
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-        {/* Info Alert */}
-        <Alert className="bg-blue-50 border-blue-200 text-blue-800">
-          <Info className="h-4 w-4" />
-          <AlertDescription>
-            This tool searches the EU's Tenders Electronic Daily (TED) database using SPARQL queries. 
-            Use the filters below to find specific notices and tenders, then export your results as CSV files.
-          </AlertDescription>
-        </Alert>
+        <Tabs defaultValue="search" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="search" className="flex items-center gap-2">
+              <Database className="h-4 w-4" />
+              TED Search
+            </TabsTrigger>
+            <TabsTrigger value="analysis" className="flex items-center gap-2">
+              <Calculator className="h-4 w-4" />
+              Market Analysis
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="search" className="mt-6 space-y-6">
+            {/* Info Alert */}
+            <Alert className="bg-blue-50 border-blue-200 text-blue-800">
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                This tool searches the EU's Tenders Electronic Daily (TED) database. 
+                Use the filters below to find specific notices and tenders, then save them for market analysis.
+                {!user && (
+                  <span className="block mt-2 font-medium">
+                    <Button variant="link" className="p-0 h-auto text-blue-700" onClick={() => navigate('/auth')}>
+                      Sign in
+                    </Button> to save tenders and calculate market share.
+                  </span>
+                )}
+              </AlertDescription>
+            </Alert>
 
-        {/* Search Form */}
-        <SearchForm
-          onSearch={handleSearch}
-          onExport={handleExport}
-          loading={loading}
-          hasResults={searchResponse?.results.length > 0}
-        />
+            {/* Search Form */}
+            <SearchForm
+              onSearch={handleSearch}
+              onExport={handleExport}
+              loading={loading}
+              hasResults={searchResponse?.results.length > 0}
+            />
 
-        {/* Results Table */}
-        {(searchResponse || loading) && (
-          <ResultsTable
-            results={searchResponse?.results || []}
-            total={searchResponse?.total || 0}
-            page={searchResponse?.page || 1}
-            totalPages={searchResponse?.totalPages || 0}
-            onPageChange={handlePageChange}
-            loading={loading}
-          />
-        )}
+            {/* Results Table */}
+            {(searchResponse || loading) && (
+              <ResultsTable
+                results={searchResponse?.results || []}
+                total={searchResponse?.total || 0}
+                page={searchResponse?.page || 1}
+                totalPages={searchResponse?.totalPages || 0}
+                onPageChange={handlePageChange}
+                loading={loading}
+              />
+            )}
+          </TabsContent>
+          
+          <TabsContent value="analysis" className="mt-6">
+            <MarketShareCalculator />
+          </TabsContent>
+        </Tabs>
       </main>
 
       {/* Footer */}

@@ -14,7 +14,174 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      market_analysis: {
+        Row: {
+          analysis_name: string
+          countries: string[] | null
+          cpv_codes: string[] | null
+          created_at: string
+          date_from: string | null
+          date_to: string | null
+          description: string | null
+          id: string
+          market_share_percentage: number | null
+          our_sector_value: number | null
+          total_market_value: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis_name: string
+          countries?: string[] | null
+          cpv_codes?: string[] | null
+          created_at?: string
+          date_from?: string | null
+          date_to?: string | null
+          description?: string | null
+          id?: string
+          market_share_percentage?: number | null
+          our_sector_value?: number | null
+          total_market_value?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analysis_name?: string
+          countries?: string[] | null
+          cpv_codes?: string[] | null
+          created_at?: string
+          date_from?: string | null
+          date_to?: string | null
+          description?: string | null
+          id?: string
+          market_share_percentage?: number | null
+          our_sector_value?: number | null
+          total_market_value?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id?: string
+          role?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      saved_tenders: {
+        Row: {
+          country: string | null
+          country_name: string | null
+          cpv_code: string | null
+          cpv_description: string | null
+          created_at: string
+          currency: string | null
+          date: string
+          id: string
+          is_our_sector: boolean | null
+          notes: string | null
+          ted_id: string
+          tender_value: number | null
+          title: string
+          type: string | null
+          updated_at: string
+          uri: string | null
+          user_id: string
+        }
+        Insert: {
+          country?: string | null
+          country_name?: string | null
+          cpv_code?: string | null
+          cpv_description?: string | null
+          created_at?: string
+          currency?: string | null
+          date: string
+          id?: string
+          is_our_sector?: boolean | null
+          notes?: string | null
+          ted_id: string
+          tender_value?: number | null
+          title: string
+          type?: string | null
+          updated_at?: string
+          uri?: string | null
+          user_id: string
+        }
+        Update: {
+          country?: string | null
+          country_name?: string | null
+          cpv_code?: string | null
+          cpv_description?: string | null
+          created_at?: string
+          currency?: string | null
+          date?: string
+          id?: string
+          is_our_sector?: boolean | null
+          notes?: string | null
+          ted_id?: string
+          tender_value?: number | null
+          title?: string
+          type?: string | null
+          updated_at?: string
+          uri?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      search_history: {
+        Row: {
+          created_at: string
+          id: string
+          results_count: number | null
+          search_filters: Json
+          search_name: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          results_count?: number | null
+          search_filters: Json
+          search_name?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          results_count?: number | null
+          search_filters?: Json
+          search_name?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
